@@ -362,10 +362,10 @@ if [ -z "$UHUBUILD_CHROOTDIR" ]; then
 	# Ez kívülről természetesen felülbírálható
 
 	export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot1:\
-							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot2:\
-							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot3:\
-							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot4:\
-							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot5"
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot2:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot3:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot4:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot5"
 fi
 
 trap 'rm -rf $UHUBUILD_RESULTDIR' EXIT
