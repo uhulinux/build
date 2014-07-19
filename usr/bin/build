@@ -18,15 +18,17 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.9.4"
+BUILD_VERSION="0.9.5"
 VENDOR="UHU Linux Baráti Kör"
 PACKAGER="UBK <ubk@ubk.hu>"
 
 case `basename $0` in
 	build)
-		export UHUBUILD_DISTR=2.2;;
+		export UHUBUILD_DISTR=3;;
 	build-2.2)
 		export UHUBUILD_DISTR=2.2;;
+	build-3)
+		export UHUBUILD_DISTR=3;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
 esac
@@ -398,7 +400,7 @@ echo
 		sed -i -e "s/^.*$/$PACKAGER/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
 		fi
 	else
-	echo "$PACKAGER" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
+	echo "$PACKAGER" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
 	fi
 	
 	# Közös vendor fájl használata
