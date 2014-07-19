@@ -20,8 +20,7 @@ scrollout
 
 BUILD_VERSION="0.9.5"
 VENDOR="UHU Linux Baráti Kör"
-UBKPACKAGER="UBK <ubk@ubk.hu>"
-PACKAGER=${PACKAGER:=UBKPACKAGER}
+PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
 case `basename $0` in
 	build)
