@@ -18,18 +18,17 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.9.3"
+BUILD_VERSION="0.9.4"
 VENDOR="UHU Linux Baráti Kör"
+PACKAGER="UBK <ubk@ubk.hu>"
 
 case `basename $0` in
 	build)
-		export UHUBUILD_DISTR=ubk;;
+		export UHUBUILD_DISTR=2.2;;
 	build-2.2)
 		export UHUBUILD_DISTR=2.2;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
-	build-ubk)
-		export UHUBUILD_DISTR=ubk;;
 esac
 
 [ "$UID" != 0 ] && {
@@ -385,20 +384,21 @@ uhu-scanpkgs .
 	if [ "$UB_UHUCHECK" = "1" ]; then
 		cd "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/
 		uhubuild-check "$i" || exit 1
-			else
-			echo
-			uzenet_var			
+	else
+		echo
+		uzenet_var			
 	fi 
 		
 echo
 yellowecho "A(z) '$i' csomag buildelése következik..."
 echo
-	# A maintainer nem lehet az UHU Maintainer Team
+	# A maintainer az UBK Team
 	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer ]; then
-		if grep -q '^UHU Maintainer Team' "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
-		redecho "A maintainer nem lehet az UHU Maintainer Team!"
-		exit 1
+		if grep -q -v "$PACKAGER" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
+		sed -i -e "s/^.*$/$PACKAGER/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
 		fi
+	else
+	echo "$PACKAGER" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
 	fi
 	
 	# Közös vendor fájl használata
@@ -457,7 +457,7 @@ echo
 		
 	if [ "$UB_NEW_RELEASE" = "1" ]; then
 		newrel=$((rel+1))
-		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
+		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release
 	fi
 
 	# Vagy, egy másik megoldás, amelyik az aktuális
