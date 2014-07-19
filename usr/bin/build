@@ -18,17 +18,18 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.9.2"
+BUILD_VERSION="0.9.3"
+VENDOR="UHU Linux Baráti Kör"
 
 case `basename $0` in
 	build)
-		export UHUBUILD_DISTR=2.2;;
-	build-2.1)
-		export UHUBUILD_DISTR=2.1;;
+		export UHUBUILD_DISTR=ubk;;
 	build-2.2)
 		export UHUBUILD_DISTR=2.2;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
+	build-ubk)
+		export UHUBUILD_DISTR=ubk;;
 esac
 
 [ "$UID" != 0 ] && {
@@ -38,9 +39,12 @@ esac
 
 export UHUBUILD_VAR=/var/uhubuild
 export UHUBUILD_PATH=/usr/src/UHUBUILD
-
 	# Az UHUBUILD_PATH az a könyvtár, amelyben
 	# a fejlesztőkörnyezet megtalálható
+export UHUBUILD_CCACHE_DIR=/var/cache/uhubuild/ccache/${UHUBUILD_DISTR}
+# export UHUBUILD_CCACHE_DIR="$UHUBUILD_VAR"/ccache
+	# A /root/ccache nem jó, mert az uhubuild
+	# felhasználónak nincs joga a /root-hoz
 
 if [ $# == 0 ]; then
 	redecho "*******************************************"
@@ -157,6 +161,11 @@ for i in "$@"; do
 			echo
 			export UB_NEW_EXTRARELEASE=1
 			shift;;
+		-nr|--new-release)
+			yellowecho "Release emelése."
+			echo
+			export UB_NEW_RELEASE=1
+			shift;;
 		-h|--help)
 			scrollout
 			appleecho "BUILDSZKRIPT ${BUILD_VERSION}":
@@ -217,7 +226,7 @@ for i in "$@"; do
 			echo
 			appleecho "[-ch1-5|--chroot1-5]:"
 			appleecho "Megadjuk, mely chroot könvtárt használja az öt közül."
-			appleecho "(/var/uhubuild/${UHUBUILD_DISTR}/chroot[1-5]"
+			appleecho "(${UHUBUILD_VAR}/${UHUBUILD_DISTR}/chroot[1-5]"
 			echo
 			appleecho "[-rch|--remove-chrootdir]:"
 			appleecho "A kapcsoló hatására letörli a chroot környezetet, majd újra felépíti"
@@ -338,11 +347,6 @@ export UHUBUILD_APT_SOURCES=/etc/apt/sources.list-build-${UHUBUILD_DISTR}
 	exit 1
 }
 
-export UHUBUILD_CCACHE_DIR=/var/cache/uhubuild/ccache
-
-	# A /root/ccache nem jó, mert az uhubuild
-	# felhasználónak nincs joga a /root-hoz
-
 export UHUBUILD_LOGPACKDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/logpack
 
 export UHUBUILD_RESULTDIR=$(mktemp -d "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp/RESULT.XXXXXX)
@@ -389,16 +393,25 @@ uhu-scanpkgs .
 echo
 yellowecho "A(z) '$i' csomag buildelése következik..."
 echo
-	# maintainer ellenőrzés: nem lehet az UHU Maintainer Team!
-	if grep -q '^UHU Maintainer Team' "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
-		redecho "******************************"
-		redecho "*** Hibás maintainer fájl! ***"
-		redecho "******************************"
+	# A maintainer nem lehet az UHU Maintainer Team
+	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer ]; then
+		if grep -q '^UHU Maintainer Team' "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
+		redecho "A maintainer nem lehet az UHU Maintainer Team!"
 		exit 1
+		fi
+	fi
+	
+	# Közös vendor fájl használata
+	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor ]; then
+		if grep -q -v "$VENDOR" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor; then
+		sed -i "s/^.*$/$VENDOR/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
+		fi
+	else
+	echo "$VENDOR" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
 	fi
 
 	if [ "$UB_RM_CCACHE" = "1" ]; then
-	rm -f /var/cache/uhubuild/ccache/${i}_ccache.tar.gz
+	rm -f "$UHUBUILD_CCACHE_DIR"/${i}_ccache.tar.gz
 	fi
 
 	if [ "$UB_RM_CSNAPSHOT" = "1" ]; then
@@ -437,24 +450,20 @@ echo
 		extrarel=1
 	fi
 	export UHUBUILD_EXTRARELEASE="$extrarel"
-	
+
 	if [ "$UB_NEW_EXTRARELEASE" = "1" ]; then
 		rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel}
+	fi
+		
+	if [ "$UB_NEW_RELEASE" = "1" ]; then
+		newrel=$((rel+1))
+		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
 	fi
 
 	# Vagy, egy másik megoldás, amelyik az aktuális
 	# dátumot használja fel e célra:
 	
 	# export UHUBUILD_EXTRARELEASE=`date +'%Y%m%h%H%M%S'`
-
-	# Közös vendor fájl használata
-	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor ]; then
-		if grep -q -v '^UHU Linux Baráti Kör' "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor; then
-		sed -i 's/^.*$/UHU Linux Baráti Kör/g' "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
-		fi
-	else
-	echo "UHU Linux Baráti Kör" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor
-	fi
 
 	# Hajrá, akkor innentől fordítunk...
 	uhubuild-chrootbuild "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i" || {

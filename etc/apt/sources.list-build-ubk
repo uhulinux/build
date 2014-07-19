@@ -5,9 +5,14 @@
 # A Packages, Packages.gz és Release fájlok megléte
 # szükséges a megadott könyvtárban!
 
-deb file:/usr/src/UBKBUILD/packages-2.1 ./
+deb file:/usr/src/UHUBUILD/packages-ubk ./
 
 # Hivatalos ftp és http lelőhelyek
 
-deb http://ftp.uhulinux.hu/pub/uhu/2.1 ./
+deb http://ftp.uhulinux.hu/pub/uhu/2.2 ./
+
+# UBK
+
+deb ftp://ubk.hu/pkg/2.2 ./
+#deb http://ubk.hu/pkg/2.2 ./
 

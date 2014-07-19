@@ -15,12 +15,14 @@ BASE=`pwd`
 KVT=" könyvtár kiürítése."
 
 case ${BASENAME} in
-	build-clean-2.1)
-		export DISTR=2.1;;
+	build-clean)
+		export DISTR=2.2;;
 	build-clean-2.2)
 		export DISTR=2.2;;
 	build-clean-dev)
 		export DISTR=dev;;
+	build-clean-ubk)
+		export DISTR=ubk;;
 esac
 
 [ "$UID" != 0 ] && {

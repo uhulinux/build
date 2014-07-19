@@ -5,7 +5,7 @@
 # A Packages, Packages.gz és Release fájlok megléte
 # szükséges a megadott könyvtárban!
 
-deb file:/usr/src/UBKBUILD/packages-dev ./
+deb file:/usr/src/UHUBUILD/packages-dev ./
 
 # Hivatalos ftp és http lelőhelyek
 
