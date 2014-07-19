@@ -20,7 +20,8 @@ scrollout
 
 BUILD_VERSION="0.9.5"
 VENDOR="UHU Linux Baráti Kör"
-PACKAGER="UBK <ubk@ubk.hu>"
+UBKPACKAGER="UBK <ubk@ubk.hu>"
+PACKAGER=${PACKAGER:=UBKPACKAGER}
 
 case `basename $0` in
 	build)
@@ -135,7 +136,7 @@ for i in "$@"; do
 			shift;;
 		-usi|--use--isnapshot)
 			yellowecho "Install snapshot használata."
-			echo		
+			echo
 			export UB_USE_SNAPSHOT=I
 			shift;;
 		-ch1|--chroot1)
@@ -258,7 +259,7 @@ for i in "$@"; do
 			appleecho "nem sikerül elsőre. Így ha valamiért, (de nem feltétlenül hiba"
 			appleecho "miatt) később újracsomagoljuk a programot, már ne használjuk ezt a"
 			appleecho "kapcsolót!"
-			echo			
+			echo
 			appleecho "[-h|--help|-?]:"
 			appleecho "Ez az a képernyő. ;-)"
 			echo
@@ -361,10 +362,10 @@ if [ -z "$UHUBUILD_CHROOTDIR" ]; then
 	# Ez kívülről természetesen felülbírálható
 
 	export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot1:\
-	                          $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot2:\
-	                          $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot3:\
-				  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot4:\
-				  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot5"
+							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot2:\
+							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot3:\
+							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot4:\
+							   $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot5"
 fi
 
 trap 'rm -rf $UHUBUILD_RESULTDIR' EXIT
@@ -388,7 +389,7 @@ uhu-scanpkgs .
 		uhubuild-check "$i" || exit 1
 	else
 		echo
-		uzenet_var			
+		uzenet_var
 	fi 
 		
 echo
@@ -402,7 +403,7 @@ echo
 	else
 	echo "$PACKAGER" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
 	fi
-	
+
 	# Közös vendor fájl használata
 	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor ]; then
 		if grep -q -v "$VENDOR" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/vendor; then
@@ -456,7 +457,7 @@ echo
 	if [ "$UB_NEW_EXTRARELEASE" = "1" ]; then
 		rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel}
 	fi
-		
+
 	if [ "$UB_NEW_RELEASE" = "1" ]; then
 		newrel=$((rel+1))
 		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release
@@ -464,7 +465,7 @@ echo
 
 	# Vagy, egy másik megoldás, amelyik az aktuális
 	# dátumot használja fel e célra:
-	
+
 	# export UHUBUILD_EXTRARELEASE=`date +'%Y%m%h%H%M%S'`
 
 	# Hajrá, akkor innentől fordítunk...
@@ -480,7 +481,7 @@ echo
 	}
 
 	# Siker.
-	
+
 	rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/"$i"
 	echo $extrarel > "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel}
 
@@ -533,11 +534,11 @@ echo
 				xargs tar --exclude sources --one-file-system -czf
 		fi
 	fi
-	greenecho "****************"	
-	greenecho "*** Rendben. ***"	
-	greenecho "****************"	
+	greenecho "****************"
+	greenecho "*** Rendben. ***"
+	greenecho "****************"
 	#UB csomagolás kész
-    
+
 done
 
 
@@ -559,8 +560,9 @@ export UHUBUILD_CHROOTDIR=
 	yellowecho A következő ub csomagok utolsó fordítása hiba miatt megszakadt:
 	yellowecho
 	ls "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/
-	      if [ -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/"$i" ]; then
-	      exit 2
-	      fi
+		if [ -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/"$i" ]; then
+			exit 2
+		fi
 	exit 0
 }
+
