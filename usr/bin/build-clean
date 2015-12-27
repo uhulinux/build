@@ -165,8 +165,7 @@ case "$1" in
 		echo "A teljes ${DISTR} UHUBUILD környezet ürítésre kerül!"
 		echo
 		chrootdir_torles ; ccache_torles ; snapshots_torles ; extrarel_torles
-		buildlogs_torles ; faileds_torles ; packages_torles ; logpack_torles
-		srcpack_torles ; tmp_torles ; patches_torles
+		faileds_torles ; packages_torles ; logpack_torles ; tmp_torles ; patches_torles
 		exit 0;;
 	-v|--version)
 		yellowecho "${BASENAME} ${BUILDCLEAN_VERSION}"
