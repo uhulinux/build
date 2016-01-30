@@ -18,7 +18,7 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.9.5"
+BUILD_VERSION="0.9.6"
 VENDOR="UHU Linux Baráti Kör"
 PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
@@ -29,6 +29,8 @@ case `basename $0` in
 		export UHUBUILD_DISTR=2.2;;
 	build-3)
 		export UHUBUILD_DISTR=3;;
+	build-3.1)
+		export UHUBUILD_DISTR=3.1;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
 esac
