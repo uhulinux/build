@@ -388,14 +388,21 @@ uhu-scanpkgs .
 	if [ "$UB_UHUCHECK" = "1" ]; then
 		cd "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/
 		uhubuild-check "$i" || exit 1
-	else
-		echo
-		uzenet_var
 	fi 
 		
 echo
 yellowecho "A(z) '$i' csomag buildelése következik..."
 echo
+
+	# Distribution fix
+	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution ]; then
+		if grep -q -v "${UHUBUILD_DISTR}" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution; then
+		sed -i -e "s/^.*$/UHU Linux ${UHUBUILD_DISTR}/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
+		fi
+	else
+	echo "UHU Linux ${UHUBUILD_DISTR}" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
+	fi
+	
 	# A maintainer az UBK Team
 	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer ]; then
 		if grep -q -v "$PACKAGER" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
