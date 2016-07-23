@@ -25,11 +25,11 @@ _build3()
 }
 complete -F _build3 build-3
 
-_build3.1()
+_buildubk1()
 {
         local cur foo
         cur=${COMP_WORDS[COMP_CWORD]}
-        foo="$(/bin/ls /usr/src/UHUBUILD/UB-3.1)"
+        foo="$(/bin/ls /usr/src/UHUBUILD/UB-UBK1)"
         COMPREPLY=($(compgen -W "$foo" -- "$cur"))
 }
-complete -F _build3.1 build-3.1
+complete -F _buildubk1 build-ubk1

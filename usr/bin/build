@@ -31,6 +31,8 @@ case `basename $0` in
 		export UHUBUILD_DISTR=3;;
 	build-3.1)
 		export UHUBUILD_DISTR=3.1;;
+	build-ubk1)
+		export UHUBUILD_DISTR=UBK1;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
 esac
@@ -292,7 +294,7 @@ rel=$(<"$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release)
 
 function uzenet_var() {
 for j in 9 8 7 6 5 4 3 2 1 0; do
-	sleep 1  
+	sleep 1
 	echo -n -e "\033[0G\033[44m\033[0m $j \033[m"
 done
 }
@@ -339,7 +341,7 @@ export UHUBUILD_APT_SOURCES=/etc/apt/sources.list-build-${UHUBUILD_DISTR}
 	# amelyekről letölthetőek a szükséges csomagok!
 	# Amennyiben szükésgünk van az általunk készített
 	# csomagokra is, adjuk meg pl. a következőt is:
-	
+
 	# deb file:/usr/src/UHUBUILD/packages-1.2 ./
 
 [ -f "$UHUBUILD_APT_SOURCES" ] || {
@@ -388,8 +390,8 @@ uhu-scanpkgs .
 	if [ "$UB_UHUCHECK" = "1" ]; then
 		cd "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/
 		uhubuild-check "$i" || exit 1
-	fi 
-		
+	fi
+
 echo
 yellowecho "A(z) '$i' csomag buildelése következik..."
 echo
@@ -402,7 +404,7 @@ echo
 	else
 	echo "UHU Linux ${UHUBUILD_DISTR}" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
 	fi
-	
+
 	# A maintainer az UBK Team
 	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer ]; then
 		if grep -q -v "$PACKAGER" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
