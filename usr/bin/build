@@ -18,7 +18,7 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.9.6"
+BUILD_VERSION="0.9.7"
 VENDOR="UHU Linux Baráti Kör"
 PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
