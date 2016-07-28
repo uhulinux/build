@@ -21,7 +21,7 @@ case ${BASENAME} in
 		export DISTR=2.2;;
 	build-clean-3)
 		export DISTR=3;;
-	build-clean-ubk1)
+	build-clean-ubk1|build-clean-UBK1)
 		export DISTR=UBK1;;
 	build-clean-dev)
 		export DISTR=dev;;
