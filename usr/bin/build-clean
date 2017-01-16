@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/build/build-common
+. /usr/lib/uhubuild/common
 scrollout
 
 # Törli az UHU-Linux ${DISTR} alá készített UBK-s csomagokhoz,
@@ -83,7 +83,7 @@ export UHUBUILD_PATH=/usr/src/UHUBUILD
 
 function ccache_torles() {
 	echo "A ccache$KVT"
-	rm -rf /var/cache/uhubuild/ccache/* 2>/dev/null
+	rm -rf /var/cache/uhubuild/ccache/${DISTR}/* 2>/dev/null
 }
 
 function chrootdir_torles() {

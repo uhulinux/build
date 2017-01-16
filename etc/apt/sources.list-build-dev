@@ -7,7 +7,7 @@
 
 deb file:/usr/src/UHUBUILD/packages-dev ./
 
-# Hivatalos ftp és http lelőhelyek
-
-deb http://ftp.uhulinux.hu/pub/uhu/dev/packages ./
+# UBK
+deb ftp://ftp.ubk.hu/pkg/UBK1/dev ./
+# deb http://download.ubk.hu/pkg/UBK1/dev ./
 
