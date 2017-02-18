@@ -77,6 +77,11 @@ export UB_UHUCHECK=1
 
 for i in "$@"; do
 	case $1 in
+		-64)
+			yellowecho "64 bites fordítás."
+			echo
+			export UB_ARCH="x86_64"
+			shift;;
 		-pv|--pack-version)
 			yellowecho "Az UB környezet becsomagolása verziókövetéssel fog megtörténni."
 			echo
