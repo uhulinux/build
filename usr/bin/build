@@ -18,13 +18,13 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.9.7"
+BUILD_VERSION="0.9.8"
 VENDOR="UHU Linux Baráti Kör"
 PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
 case `basename $0` in
 	build)
-		export UHUBUILD_DISTR=3;;
+		export UHUBUILD_DISTR=UBK1;;
 	build-2.2)
 		export UHUBUILD_DISTR=2.2;;
 	build-3)
@@ -74,13 +74,14 @@ fi
 export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile
 export UHUBUILD_INSTALLSNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install
 export UB_UHUCHECK=1
+export UB_ARCH="i386"
 
 for i in "$@"; do
 	case $1 in
 		-64)
 			yellowecho "64 bites fordítás."
 			echo
-			export UB_ARCH="x86_64"
+			export UB_ARCH="amd64"
 			shift;;
 		-pv|--pack-version)
 			yellowecho "Az UB környezet becsomagolása verziókövetéssel fog megtörténni."
@@ -482,6 +483,7 @@ echo
 	# export UHUBUILD_EXTRARELEASE=`date +'%Y%m%h%H%M%S'`
 
 	# Hajrá, akkor innentől fordítunk...
+	export UHUBUILD_ARCH="${UB_ARCH}"
 	uhubuild-chrootbuild "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i" || {
 
 	# Hiba történt!
