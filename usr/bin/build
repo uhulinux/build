@@ -475,12 +475,9 @@ echo
 	if [ "$UB_NEW_RELEASE" = "1" ]; then
 		newrel=$((rel+1))
 		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release
+		export UHUBUILD_EXTRARELEASE="1"
 	fi
 
-	# Vagy, egy másik megoldás, amelyik az aktuális
-	# dátumot használja fel e célra:
-
-	# export UHUBUILD_EXTRARELEASE=`date +'%Y%m%h%H%M%S'`
 
 	# Hajrá, akkor innentől fordítunk...
 	export UHUBUILD_ARCH="${UB_ARCH}"
