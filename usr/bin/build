@@ -69,6 +69,7 @@ fi
 	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp
 	mkdir -p "$UHUBUILD_PATH"/patches-${UHUBUILD_DISTR}
 	mkdir -p "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/ub
+	mkdir -p "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/ub
 }
 
 export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile
@@ -184,7 +185,7 @@ for i in "$@"; do
 			echo
 			appleecho "HASZNÁLAT:"
 			echo
-			appleecho "build-${UHUBUILD_DISTR} $1 [-pv][-ps][-ns][-ncs][-nis][-rs][-rc][-ch1][-ch2][-ch3]"
+			appleecho "build-${UHUBUILD_DISTR} $1 [-64][-pv][-ps][-ns][-ncs][-nis][-rs][-rc][-ch1][-ch2][-ch3]"
 			appleecho "[-ch4][-ch5][-rch][-nuch][-usc|-usi][-cc][-ner] csomag1 [csomag2] [csomag3] [...]"
 			echo
 			appleecho "vagy (posix kapcsolókkal):"
@@ -207,6 +208,9 @@ for i in "$@"; do
 			appleecho "megjelenő, a csomag nevével azonos nevű fájl is jelzi."
 			echo
 			appleecho "Opcionálisan megadható kapcsolók jelentése:"
+			appleecho "[-64]:"
+			appleecho "64 bites fordítás."
+			echo
 			appleecho "[-pv|--pack-version]:"
 			appleecho "Az opcionálisan megadható '-pv' v. '--pack-version' kapcsoló hatására az UB"
 			appleecho "csomagokról készülő 'backup' oly módon fog elkészülni, hogy annak neve"
