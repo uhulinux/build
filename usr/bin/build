@@ -79,7 +79,7 @@ export UB_ARCH="i386"
 for i in "$@"; do
 	case $1 in
 		-64)
-			if [ ! "$(uname -m)" == "x86_64" ];then
+			if [ "$(uname -m)" != "x86_64" ];then
 				die "Csak 64 bites módban indítva lehet 64 bites fordítást készíteni!"
 			fi
 			yellowecho "64 bites fordítás."
@@ -391,7 +391,11 @@ fi
 # Az esetleg már létező lokális UHU csomagokhoz kapcsolódó
 # Packages fájlok ismételt létrehozása
 
-cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
+if [ "$UB_ARCH" == "amd64" ]; then
+	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/
+else
+	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
+fi
 uhu-scanpkgs .
 
 	if [ "$UB_UHUCHECK" = "1" ]; then
@@ -503,15 +507,26 @@ echo
 	# A kész csomagokat a packages-${UHUBUILD_DISTR}/ alá másoljuk,
 	# de töröljük onnan a régebbi példányokat.
 
-	for pkg in $(ls $UHUBUILD_RESULTDIR); do
-		rm -f "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${pkg%%_*}_*
-	done
-	cp -a $UHUBUILD_RESULTDIR/* "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
+	if [ "$UB_ARCH" == "amd64" ]; then
+		for pkg in $(ls $UHUBUILD_RESULTDIR); do
+			rm -f "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/${pkg%%_*}_*
+		done
+		cp -a $UHUBUILD_RESULTDIR/* "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/
+	else
+		for pkg in $(ls $UHUBUILD_RESULTDIR); do
+			rm -f "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${pkg%%_*}_*
+		done
+		cp -a $UHUBUILD_RESULTDIR/* "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
+	fi
 
 	# A Packages és Packages.gz fájlok létrehozása a lokálisan
 	# megtalálható új UHU csomagjaink alkalmazhatósága érdekében
 
-	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
+	if [ "$UB_ARCH" == "amd64" ]; then
+		cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/
+	else
+		cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
+	fi
 
 	if [ "$UB_CONTENTS" = "1" ]; then
 		uhu-scanpkgs -c .
@@ -524,29 +539,55 @@ echo
 	# deb file:/usr/src/UHUBUILD/packages-1.2 ./
 
 	# Becsomagoljuk az UB környezetet, es elhelyezzük a packages-1.2/ub könyvtárban.
+	if [ "$UB_ARCH" == "amd64" ]; then
+		cd $UHUBUILD_PATH/UB-${UHUBUILD_DISTR}/
+		mkdir -p $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub
 
-	cd $UHUBUILD_PATH/UB-${UHUBUILD_DISTR}/
-	mkdir -p $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub
-
-	if [ "$UB_PACK_VERSION" = "1" ]; then
-		if [ "$UB_PACK_SOURCE" = "1" ]; then
-			echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-			echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
-				xargs tar --one-file-system -czf
+		if [ "$UB_PACK_VERSION" = "1" ]; then
+			if [ "$UB_PACK_SOURCE" = "1" ]; then
+				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
+					xargs tar --one-file-system -czf
+			else
+				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
+					xargs tar --exclude sources --one-file-system -czf
+			fi
 		else
-			echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-			echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
-				xargs tar --exclude sources --one-file-system -czf
+			if [ "$UB_PACK_SOURCE" = "1" ]; then
+				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_ub.tar.gz ${i} |\
+					xargs tar --one-file-system -czf
+			else
+				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_ub.tar.gz ${i} |\
+					xargs tar --exclude sources --one-file-system -czf
+			fi
 		fi
 	else
-		if [ "$UB_PACK_SOURCE" = "1" ]; then
-			echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-			echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_ub.tar.gz ${i} |\
-				xargs tar --one-file-system -czf
+		cd $UHUBUILD_PATH/UB-${UHUBUILD_DISTR}/
+		mkdir -p $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub
+
+		if [ "$UB_PACK_VERSION" = "1" ]; then
+			if [ "$UB_PACK_SOURCE" = "1" ]; then
+				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
+					xargs tar --one-file-system -czf
+			else
+				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
+					xargs tar --exclude sources --one-file-system -czf
+			fi
 		else
-			echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-			echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_ub.tar.gz ${i} |\
-				xargs tar --exclude sources --one-file-system -czf
+			if [ "$UB_PACK_SOURCE" = "1" ]; then
+				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_ub.tar.gz ${i} |\
+					xargs tar --one-file-system -czf
+			else
+				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
+				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_ub.tar.gz ${i} |\
+					xargs tar --exclude sources --one-file-system -czf
+			fi
 		fi
 	fi
 	greenecho "****************"
