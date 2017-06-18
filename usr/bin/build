@@ -80,8 +80,8 @@ for i in "$@"; do
 	case $1 in
 		-64)
 			if [ ! "$(uname -m)" == "x86_64" ];then
-                die "Csak 64 bites módban indítva lehet 64 bites fordítást készíteni!"
-            fi
+				die "Csak 64 bites módban indítva lehet 64 bites fordítást készíteni!"
+			fi
 			yellowecho "64 bites fordítás."
 			echo
 			export UB_ARCH="amd64"
