@@ -465,8 +465,8 @@ mv -f "$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_compiled.tar.gz \
 	"$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_${ver}-${rel}_compiled.tar.gz \
 	2> /dev/null
 
-mv -f "$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_installed.tar.gz \
-	"$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_${ver}-${rel}_installed.tar.gz \
+mv -f "$UHUBUILD_INSTALLSNAPSHOTDIR"/${i}_installed.tar.gz \
+	"$UHUBUILD_INSTALLSNAPSHOTDIR"/${i}_${ver}-${rel}_installed.tar.gz \
 	2> /dev/null
 
 echo
