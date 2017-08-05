@@ -44,10 +44,6 @@ export UHUBUILD_VAR=/var/uhubuild
 export UHUBUILD_PATH=/usr/src/UHUBUILD
 	# Az UHUBUILD_PATH az a könyvtár, amelyben
 	# a fejlesztőkörnyezet megtalálható
-export UHUBUILD_CCACHE_DIR=/var/cache/uhubuild/ccache/${UHUBUILD_DISTR}
-# export UHUBUILD_CCACHE_DIR="$UHUBUILD_VAR"/ccache
-	# A /root/ccache nem jó, mert az uhubuild
-	# felhasználónak nincs joga a /root-hoz
 
 if [ $# == 0 ]; then
 	redecho "*******************************************"
@@ -61,21 +57,18 @@ fi
 [ -d "$UHUBUILD_PATH" ] || {
 	# Nem létezik a Build környezet, létrehozzuk
 	mkdir -p "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/logpack
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp
-	mkdir -p "$UHUBUILD_PATH"/patches-${UHUBUILD_DISTR}
-	mkdir -p "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/ub
-	mkdir -p "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/ub
+	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${UB_ARCH}
+	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}
+	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${UB_ARCH}
+	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${UB_ARCH}
+	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/logpack/${UB_ARCH}
+	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp/${UB_ARCH}
 }
 
-export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile
-export UHUBUILD_INSTALLSNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install
-export UB_UHUCHECK=1
 export UB_ARCH="i386"
+export UHUBUILD_CCACHE_DIR=/var/cache/uhubuild/ccache/${UHUBUILD_DISTR}/${UB_ARCH}
+export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${UB_ARCH}
+export UHUBUILD_INSTALLSNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${UB_ARCH}
 
 for i in "$@"; do
 	case $1 in
@@ -86,19 +79,6 @@ for i in "$@"; do
 			yellowecho "64 bites fordítás."
 			echo
 			export UB_ARCH="amd64"
-			if [ ! -d "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/ub ]; then
-				mkdir -p "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/ub
-			fi
-			shift;;
-		-pv|--pack-version)
-			yellowecho "Az UB környezet becsomagolása verziókövetéssel fog megtörténni."
-			echo
-			export UB_PACK_VERSION=1
-			shift;;
-		-ps|--pack-source)
-			yellowecho "Az UB környezet becsomagolása a forrás(ok)kal fog megtörténni."
-			echo
-			export UB_PACK_SOURCE=1
 			shift;;
 		-cc|--create-contents)
 			yellowecho "Contents.gz készítése a packages könyvtárban."
@@ -111,18 +91,6 @@ for i in "$@"; do
 			export UHUBUILD_COMPILESNAPSHOTDIR=
 			export UHUBUILD_INSTALLSNAPSHOTDIR=
 			export UB_NOSNAPSHOT=1
-			shift;;
-		-ncs|--no-csnapshot)
-			yellowecho "Nem készül compile snaphsot."
-			echo
-			export UHUBUILD_COMPILESNAPSHOTDIR=
-			export UB_NOCSNAPSHOT=1
-			shift;;
-		-nis|--no-isnapshot)
-			yellowecho "Nem készül install snaphsot."
-			echo
-			export UHUBUILD_INSTALLSNAPSHOTDIR=
-			export UB_NOISNAPSHOT=1
 			shift;;
 		-rcs|--remove-csnapshot)
 			yellowecho "Régebbi compile snapshot törlése."
@@ -154,23 +122,19 @@ for i in "$@"; do
 			export UB_USE_SNAPSHOT=I
 			shift;;
 		-ch1|--chroot1)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/chroot1
+			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot1
 			shift;;
 		-ch2|--chroot2)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/chroot2
+			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot2
 			shift;;
 		-ch3|--chroot3)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/chroot3
+			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot3
 			shift;;
 		-ch4|--chroot4)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/chroot4
+			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot4
 			shift;;
 		-ch5|--chroot5)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/chroot5
-			shift;;
-		-nuch|--no-uhucheck)
-			yellowecho "UHUBUILD-CHECK kihagyva."
-			export UB_UHUCHECK=0
+			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot5
 			shift;;
 		-ner|--new-extrarelease)
 			yellowecho "Extrarelease törlése."
@@ -207,36 +171,18 @@ for i in "$@"; do
 			read
 			echo
 			appleecho "Amennyiben valamelyik megadott csomag fordítása hiba miatt megszakad, azt a"
-			appleecho "fordítás végén a $UHUBUILD_PATH/misc-${UHUBUILD_DISTR}/failed/ könyvtárban"
+			appleecho "fordítás végén a $UHUBUILD_PATH/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH} könyvtárban"
 			appleecho "megjelenő, a csomag nevével azonos nevű fájl is jelzi."
 			echo
 			appleecho "Opcionálisan megadható kapcsolók jelentése:"
 			appleecho "[-64]:"
 			appleecho "64 bites fordítás."
 			echo
-			appleecho "[-pv|--pack-version]:"
-			appleecho "Az opcionálisan megadható '-pv' v. '--pack-version' kapcsoló hatására az UB"
-			appleecho "csomagokról készülő 'backup' oly módon fog elkészülni, hogy annak neve"
-			appleecho "tartalmazni fogja a csomag verziószámát is."
-			appleecho "Példa:"
-			echo
-			appleecho "a '-pv|--pack-version' kapcsoló nélkül: 'csomag1.UB.tar.gz'"
-			appleecho "a '-pv|--pack-version' kapcsolóval    : 'csomag1_\${version}-\${release}_UB.tar.gz'"
-			echo
-			appleecho "[-ps|--pack-source]:"
-			appleecho "A becsomagolt UB forrás a 'source' mappát is tartalmazza."
-			echo
 			appleecho "[-ns|--no-snapshot]:"
 			appleecho "Nem készülnek snapshot fájlok."
 			echo
-			appleecho "[-ncs|--no-csnapshot]:"
-			appleecho "Nem készül compile snapshot fájl."
-			echo
 			yellowecho "Nyomj egy ENTER-t a következő oldalhoz!"
 			read
-			appleecho "[-nis|--no-isnapshot]:"
-			appleecho "Nem készül install snapshot fájl."
-			echo
 			appleecho "[-rs|--remove-snapshot]:"
 			appleecho "Törlődnek a régebbi, adott csomaghoz kapcsolódó snapshot fájlok."
 			echo
@@ -245,7 +191,7 @@ for i in "$@"; do
 			echo
 			appleecho "[-ch1-5|--chroot1-5]:"
 			appleecho "Megadjuk, mely chroot könvtárt használja az öt közül."
-			appleecho "(${UHUBUILD_VAR}/${UHUBUILD_DISTR}/chroot[1-5]"
+			appleecho "(${UHUBUILD_VAR}/${UHUBUILD_DISTR}/${UB_ARCH}/chroot[1-5]"
 			echo
 			appleecho "[-rch|--remove-chrootdir]:"
 			appleecho "A kapcsoló hatására letörli a chroot környezetet, majd újra felépíti"
@@ -266,9 +212,6 @@ for i in "$@"; do
 			appleecho "[-cc|--create-contents]:"
 			appleecho "Az adott verzió packages könyvtárában a build folyamat végén elkészül egy"
 			appleecho "Contents.gz fájl is."
-			echo
-			appleecho "[-nuch|--no-uhucheck]:"
-			appleecho "Nem ellenőrzi az UB forrás helyességét. (Csak saját felelősségre!)"
 			echo
 			appleecho "[-ner|--new-extrarelease]:"
 			appleecho "Törli (azaz újból 1-re állítja) a csomag extrarelease értékét. Ez"
@@ -315,7 +258,7 @@ done
 
 if [ "$UB_RM_CHROOTDIR" = "1" ]; then
 		if [ "$UHUBUILD_CHROOTDIR" = "" ]; then
-			export UHUBUILD_CHROOTDIR=""$UHUBUILD_VAR"/${UHUBUILD_DISTR}/chroot1"
+			export UHUBUILD_CHROOTDIR=""$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot1"
 			yellowecho "Mivel nem adtál meg chroot számot [1-5], ezért az alapértelmezett,"
 			yellowecho "${UHUBUILD_CHROOTDIR}-t fogom törölni."
 			echo
@@ -330,12 +273,12 @@ if [ "$UB_RM_CHROOTDIR" = "1" ]; then
 fi
 
 if [ "$UB_USE_SNAPSHOT" = "C" ]; then
-	export UHUBUILD_SNAPSHOTFILE="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${1}_${ver}-${rel}_compiled.tar.gz
+	export UHUBUILD_SNAPSHOTFILE="$UHUBUILD_COMPILESNAPSHOTDIR"/${1}_${ver}-${rel}_compiled.tar.gz
 	export UB_USE_SNAPSHOT=1
 fi
 
 if [ "$UB_USE_SNAPSHOT" = "I" ]; then
-	export UHUBUILD_SNAPSHOTFILE="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${1}_${ver}-${rel}_installed.tar.gz
+	export UHUBUILD_SNAPSHOTFILE="$UHUBUILD_INSTALLSNAPSHOTDIR"/${1}_${ver}-${rel}_installed.tar.gz
 	export UB_USE_SNAPSHOT=1
 fi
 
@@ -366,9 +309,9 @@ export UHUBUILD_APT_SOURCES=/etc/apt/sources.list-build-${UHUBUILD_DISTR}
 	exit 1
 }
 
-export UHUBUILD_LOGPACKDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/logpack
+export UHUBUILD_LOGPACKDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/logpack/${UB_ARCH}
 
-export UHUBUILD_RESULTDIR=$(mktemp -d "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp/RESULT.XXXXXX)
+export UHUBUILD_RESULTDIR=$(mktemp -d "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp/${UB_ARCH}/RESULT.XXXXXX)
 
 	# Az eredményt majd egy ideiglenes könyvtár alá
 	# rakjuk, mert így könnyebb lesz törölni a régi
@@ -378,11 +321,11 @@ if [ -z "$UHUBUILD_CHROOTDIR" ]; then
 
 	# Ez kívülről természetesen felülbírálható
 
-	export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot1:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot2:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot3:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot4:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/chroot5"
+	export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot1:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot2:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot3:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot4:\
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot5"
 fi
 
 trap 'rm -rf $UHUBUILD_RESULTDIR' EXIT
@@ -398,17 +341,12 @@ fi
 # Az esetleg már létező lokális UHU csomagokhoz kapcsolódó
 # Packages fájlok ismételt létrehozása
 
-if [ "$UB_ARCH" == "amd64" ]; then
-	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/
-else
-	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
-fi
+cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}
+
 uhu-scanpkgs .
 
-	if [ "$UB_UHUCHECK" = "1" ]; then
-		cd "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/
-		uhubuild-check "$i" || exit 1
-	fi
+cd "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/
+uhubuild-check "$i" || exit 1
 
 echo
 yellowecho "A(z) '$i' csomag buildelése következik..."
@@ -446,36 +384,18 @@ echo
 	fi
 
 	if [ "$UB_RM_CSNAPSHOT" = "1" ]; then
-		if [ "$UB_NOSNAPSHOT" = "1" ]; then
-			rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${i}_${ver}-${rel}_compiled.tar.gz
-		else
-			rm -f "$UHUBUILD_COMPILESNAPSHOTDIR"/misc-${UHUBUILD_DISTR}/snapshot/compile/${i}_${ver}_${rel}-compiled.tar.gz
-		fi
+		rm -f "$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_${ver}_${rel}-compiled.tar.gz
 	fi
 
 	if [ "$UB_RM_ISNAPSHOT" = "1" ]; then
-		if [ "$UB_NOSNAPSHOT" = "1" ]; then
-			rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${i}_${ver}-${rel}_installed.tar.gz
-		else
-			rm -f "$UHUBUILD_COMPILESNAPSHOTDIR"/misc-${UHUBUILD_DISTR}/snapshot/install/${i}_${ver}-${rel}_installed.tar.gz
-		fi
-	fi
-
-	if [ "$UB_NOCSNAPSHOT" = "1" ]; then
-		if [ "$UB_NOISNAPSHOT" = "1" ]; then
-			echo
-			redecho "*******************************************"
-			redecho "*** Használd inkább az '-ns' kapcsolót! ***"
-			redecho "*******************************************"
-			exit 1
-		fi
+		rm -f "$UHUBUILD_INSTALLSNAPSHOTDIR"/${i}_${ver}-${rel}_installed.tar.gz
 	fi
 
 	# Kiszedjük a forrásból a version és a release értékeket, ezek és az
 	# eltárolt EXTRARELEASE alapján kiszámoljuk az új extrarelease értékét.
 
-	if [ -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel} ]; then
-		extrarel=$(<"$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel})
+	if [ -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${UB_ARCH}/${i}_${ver}-${rel} ]; then
+		extrarel=$(<"$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${UB_ARCH}/${i}_${ver}-${rel})
 		extrarel=$((extrarel+1))
 	else
 		extrarel=1
@@ -483,12 +403,12 @@ echo
 	export UHUBUILD_EXTRARELEASE="$extrarel"
 
 	if [ "$UB_NEW_EXTRARELEASE" = "1" ]; then
-		rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel}
+		rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${UB_ARCH}/${i}_${ver}-${rel}
 	fi
 
 	if [ "$UB_NEW_RELEASE" = "1" ]; then
 		newrel=$((rel+1))
-		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release
+		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/${UB_ARCH}/"$i"/release
 		export UHUBUILD_EXTRARELEASE="1"
 	fi
 
@@ -502,38 +422,27 @@ echo
 	# ha az egyik csomag buildelése hiba miatt megszakad, azt
 	# a ...misc-1.2/failed/csomagneve fájl megjelenése jelzi
 	# Ezeket a végén kiíratjuk a képernyőre
-	touch "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/"$i"
+	touch "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}/"$i"
 	continue
 	}
 
 	# Siker.
 
-	rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/"$i"
-	echo $extrarel > "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${i}_${ver}-${rel}
+	rm -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}/"$i"
+	echo $extrarel > "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${UB_ARCH}/${i}_${ver}-${rel}
 
 	# A kész csomagokat a packages-${UHUBUILD_DISTR}/ alá másoljuk,
 	# de töröljük onnan a régebbi példányokat.
 
-	if [ "$UB_ARCH" == "amd64" ]; then
-		for pkg in $(ls $UHUBUILD_RESULTDIR); do
-			rm -f "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/${pkg%%_*}_*
-		done
-		cp -a $UHUBUILD_RESULTDIR/* "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/
-	else
-		for pkg in $(ls $UHUBUILD_RESULTDIR); do
-			rm -f "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${pkg%%_*}_*
-		done
-		cp -a $UHUBUILD_RESULTDIR/* "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
-	fi
+	for pkg in $(ls $UHUBUILD_RESULTDIR); do
+		rm -f "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}/${pkg%%_*}_*
+	done
+	cp -a $UHUBUILD_RESULTDIR/* "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}/
 
 	# A Packages és Packages.gz fájlok létrehozása a lokálisan
 	# megtalálható új UHU csomagjaink alkalmazhatósága érdekében
 
-	if [ "$UB_ARCH" == "amd64" ]; then
-		cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}-64/
-	else
-		cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/
-	fi
+	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}/
 
 	if [ "$UB_CONTENTS" = "1" ]; then
 		uhu-scanpkgs -c .
@@ -545,72 +454,19 @@ echo
 	# beírható pl. a következő sor:
 	# deb file:/usr/src/UHUBUILD/packages-1.2 ./
 
-	# Becsomagoljuk az UB környezetet, es elhelyezzük a packages-1.2/ub könyvtárban.
-	if [ "$UB_ARCH" == "amd64" ]; then
-		cd $UHUBUILD_PATH/UB-${UHUBUILD_DISTR}/
-		mkdir -p $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub
-
-		if [ "$UB_PACK_VERSION" = "1" ]; then
-			if [ "$UB_PACK_SOURCE" = "1" ]; then
-				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
-					xargs tar --one-file-system -czf
-			else
-				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
-					xargs tar --exclude sources --one-file-system -czf
-			fi
-		else
-			if [ "$UB_PACK_SOURCE" = "1" ]; then
-				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_ub.tar.gz ${i} |\
-					xargs tar --one-file-system -czf
-			else
-				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}-64/ub/${i}_ub.tar.gz ${i} |\
-					xargs tar --exclude sources --one-file-system -czf
-			fi
-		fi
-	else
-		cd $UHUBUILD_PATH/UB-${UHUBUILD_DISTR}/
-		mkdir -p $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub
-
-		if [ "$UB_PACK_VERSION" = "1" ]; then
-			if [ "$UB_PACK_SOURCE" = "1" ]; then
-				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
-					xargs tar --one-file-system -czf
-			else
-				echo "${i}_${ver}-${rel}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_${ver}-${rel}_ub.tar.gz ${i} |\
-					xargs tar --exclude sources --one-file-system -czf
-			fi
-		else
-			if [ "$UB_PACK_SOURCE" = "1" ]; then
-				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_ub.tar.gz ${i} |\
-					xargs tar --one-file-system -czf
-			else
-				echo "${i}_ub.tar.gz létrehozása a $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub könyvtárba..."
-				echo $UHUBUILD_PATH/packages-${UHUBUILD_DISTR}/ub/${i}_ub.tar.gz ${i} |\
-					xargs tar --exclude sources --one-file-system -czf
-			fi
-		fi
-	fi
 	greenecho "****************"
 	greenecho "*** Rendben. ***"
 	greenecho "****************"
-	#UB csomagolás kész
 
 done
 
 
-mv -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${i}_compiled.tar.gz \
-	"$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${i}_${ver}-${rel}_compiled.tar.gz \
+mv -f "$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_compiled.tar.gz \
+	"$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_${ver}-${rel}_compiled.tar.gz \
 	2> /dev/null
 
-mv -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${i}_installed.tar.gz \
-	"$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${i}_${ver}-${rel}_installed.tar.gz \
+mv -f "$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_installed.tar.gz \
+	"$UHUBUILD_COMPILESNAPSHOTDIR"/${i}_${ver}-${rel}_installed.tar.gz \
 	2> /dev/null
 
 echo
@@ -619,11 +475,11 @@ echo
 
 export UHUBUILD_CHROOTDIR=
 
-[ `ls -1 "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/ | wc -l` = 0 ] || {
+[ `ls -1 "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}/ | wc -l` = 0 ] || {
 	yellowecho A következő ub csomagok utolsó fordítása hiba miatt megszakadt:
 	yellowecho
-	ls "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/
-		if [ -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/"$i" ]; then
+	ls "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}/
+		if [ -f "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}/"$i" ]; then
 			exit 2
 		fi
 	exit 0
