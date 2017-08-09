@@ -40,6 +40,7 @@ esac
 	exit 1
 	}
 
+export UB_ARCH="i386"
 export UHUBUILD_VAR=/var/uhubuild
 export UHUBUILD_PATH=/usr/src/UHUBUILD
 	# Az UHUBUILD_PATH az a könyvtár, amelyben
@@ -65,7 +66,6 @@ fi
 	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp/${UB_ARCH}
 }
 
-export UB_ARCH="i386"
 export UHUBUILD_CCACHE_DIR=/var/cache/uhubuild/ccache/${UHUBUILD_DISTR}/${UB_ARCH}
 export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${UB_ARCH}
 export UHUBUILD_INSTALLSNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${UB_ARCH}
@@ -130,12 +130,6 @@ for i in "$@"; do
 		-ch3|--chroot3)
 			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot3
 			shift;;
-		-ch4|--chroot4)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot4
-			shift;;
-		-ch5|--chroot5)
-			export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot5
-			shift;;
 		-ner|--new-extrarelease)
 			yellowecho "Extrarelease törlése."
 			echo
@@ -153,7 +147,7 @@ for i in "$@"; do
 			appleecho "HASZNÁLAT:"
 			echo
 			appleecho "build-${UHUBUILD_DISTR} $1 [-64][-pv][-ps][-ns][-ncs][-nis][-rs][-rc][-ch1][-ch2][-ch3]"
-			appleecho "[-ch4][-ch5][-rch][-nuch][-usc|-usi][-cc][-ner] csomag1 [csomag2] [csomag3] [...]"
+			appleecho "[-rch][-nuch][-usc|-usi][-cc][-ner] csomag1 [csomag2] [csomag3] [...]"
 			echo
 			appleecho "vagy (posix kapcsolókkal):"
 			appleecho "[--pack-version][--pack-source][--no-snapshot][--no-csnapshot][--no-isnapshot]"
@@ -189,7 +183,7 @@ for i in "$@"; do
 			appleecho "[-rc|--remove-ccache]:"
 			appleecho "Törlődik a régebbi, adott csomaghoz kapcsolódó ccache fájl."
 			echo
-			appleecho "[-ch1-5|--chroot1-5]:"
+			appleecho "[-ch1-3|--chroot1-3]:"
 			appleecho "Megadjuk, mely chroot könvtárt használja az öt közül."
 			appleecho "(${UHUBUILD_VAR}/${UHUBUILD_DISTR}/${UB_ARCH}/chroot[1-5]"
 			echo
@@ -259,7 +253,7 @@ done
 if [ "$UB_RM_CHROOTDIR" = "1" ]; then
 		if [ "$UHUBUILD_CHROOTDIR" = "" ]; then
 			export UHUBUILD_CHROOTDIR=""$UHUBUILD_VAR"/${UHUBUILD_DISTR}/${UB_ARCH}/chroot1"
-			yellowecho "Mivel nem adtál meg chroot számot [1-5], ezért az alapértelmezett,"
+			yellowecho "Mivel nem adtál meg chroot számot [1-3], ezért az alapértelmezett,"
 			yellowecho "${UHUBUILD_CHROOTDIR}-t fogom törölni."
 			echo
 		fi
@@ -323,9 +317,7 @@ if [ -z "$UHUBUILD_CHROOTDIR" ]; then
 
 	export UHUBUILD_CHROOTDIR="$UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot1:\
 						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot2:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot3:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot4:\
-						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot5"
+						  $UHUBUILD_VAR/${UHUBUILD_DISTR}/${UB_ARCH}/chroot3"
 fi
 
 trap 'rm -rf $UHUBUILD_RESULTDIR' EXIT
