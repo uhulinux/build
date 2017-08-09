@@ -5,7 +5,8 @@
 # A Packages, Packages.gz és Release fájlok megléte
 # szükséges a megadott könyvtárban!
 
-deb file:/usr/src/UHUBUILD/packages-UBK1 ./
+deb [arch=i386] file:/usr/src/UHUBUILD/packages-UBK1/i386 ./
+deb [arch=amd64] file:/usr/src/UHUBUILD/packages-UBK1/amd64 ./
 
 # UBK
 deb ftp://ftp.ubk.hu/pkg/UBK1/main ./

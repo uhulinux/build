@@ -88,7 +88,7 @@ function ccache_torles() {
 
 function chrootdir_torles() {
 	echo "A chroot könyvtárak kiürítése."
-	for a in 1 2 3 4 5 ; do
+	for a in 1 2 3 ; do
 		cd ${UHUBUILD_VAR}/${DISTR}/chroot${a}/
 		rm -rf *
 	done
