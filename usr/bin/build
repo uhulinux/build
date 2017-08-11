@@ -84,8 +84,6 @@ for i in "$@"; do
 		-ns|--no-snapshot)
 			yellowecho "Nem készül egy snapshot sem."
 			echo
-			export UHUBUILD_COMPILESNAPSHOTDIR=
-			export UHUBUILD_INSTALLSNAPSHOTDIR=
 			export UB_NOSNAPSHOT=1
 			shift;;
 		-rcs|--remove-csnapshot)
@@ -240,8 +238,13 @@ ver=$(<"$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/version)
 rel=$(<"$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release)
 
 export UHUBUILD_CCACHE_DIR=/var/cache/uhubuild/ccache/${UHUBUILD_DISTR}/${UB_ARCH}
-export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${UB_ARCH}
-export UHUBUILD_INSTALLSNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${UB_ARCH}
+if [ "$UB_NOSNAPSHOT" = "1" ]; then
+	export UHUBUILD_COMPILESNAPSHOTDIR=
+	export UHUBUILD_INSTALLSNAPSHOTDIR=
+else
+	export UHUBUILD_COMPILESNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${UB_ARCH}
+	export UHUBUILD_INSTALLSNAPSHOTDIR="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${UB_ARCH}
+fi
 
 if [ "$UB_RM_CHROOTDIR" = "1" ]; then
 		if [ "$UHUBUILD_CHROOTDIR" = "" ]; then
