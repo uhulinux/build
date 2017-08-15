@@ -31,6 +31,8 @@ case `basename $0` in
 		export UHUBUILD_DISTR=3;;
 	build-ubk1|build-UBK1)
 		export UHUBUILD_DISTR=UBK1;;
+	build-ubk2|build-UBK2)
+		export UHUBUILD_DISTR=UBK1;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
 esac
@@ -274,9 +276,7 @@ fi
 
 if [ "$UB_USE_SNAPSHOT" = "1" ]; then
 	[ -f "$UHUBUILD_SNAPSHOTFILE" ] || {
-		# Nem létezik a szükséges snapshot fájl,
-		# kilépés!
-
+		# Nem létezik a szükséges snapshot fájl, kilépés!
 		redecho "Nem létezik a(z) ${UHUBUILD_SNAPSHOTFILE} fájl!"
 		exit 1
 	}
@@ -292,9 +292,7 @@ export UHUBUILD_APT_SOURCES=/etc/apt/sources.list-build-${UHUBUILD_DISTR}
 	# deb file:/usr/src/UHUBUILD/packages-1.2 ./
 
 [ -f "$UHUBUILD_APT_SOURCES" ] || {
-	# Nem létezik a Build környezet,
-	# kilépés!
-
+	# Nem létezik a Build környezet, kilépés!
 	redecho "Nem létezik a $UHUBUILD_APT_SOURCES állomány!"
 	exit 1
 }
@@ -318,14 +316,6 @@ fi
 
 trap 'rm -rf $UHUBUILD_RESULTDIR' EXIT
 
-if [ $1 = -d ]; then
-	# Ha van megadva '-d' kapcsoló, a paramétereket eggyel balra 'toljuk'
-	# ennek köszönhetően a következő ciklus nem fogja megpróbálni a
-	# '-d' csomagot lefordítani :-)
-
-	shift
-fi
-
 # Az esetleg már létező lokális UHU csomagokhoz kapcsolódó
 # Packages fájlok ismételt létrehozása
 
@@ -341,21 +331,23 @@ yellowecho "A(z) '$i' csomag buildelése következik..."
 echo
 
 	# Distribution fix
-	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution ]; then
-		if grep -q -v "${UHUBUILD_DISTR}" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution; then
-		sed -i -e "s/^.*$/UHU Linux ${UHUBUILD_DISTR}/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
+	if [ "$UHUBUILD_DISTR" != "dev" ]; then
+		if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution ]; then
+			if grep -q -v "${UHUBUILD_DISTR}" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution; then
+				sed -i -e "s/^.*$/UHU Linux ${UHUBUILD_DISTR}/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
+			fi
+		else
+			echo "UHU Linux ${UHUBUILD_DISTR}" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
 		fi
-	else
-	echo "UHU Linux ${UHUBUILD_DISTR}" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/distribution
 	fi
 
 	# A maintainer az UBK Team
 	if [ -f "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer ]; then
 		if grep -q -v "$PACKAGER" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer; then
-		sed -i -e "s/^.*$/$PACKAGER/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
+			sed -i -e "s/^.*$/$PACKAGER/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
 		fi
 	else
-	echo "$PACKAGER" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
+		echo "$PACKAGER" > "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/maintainer
 	fi
 
 	# Közös vendor fájl használata
