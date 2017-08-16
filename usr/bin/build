@@ -18,7 +18,7 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.11.1"
+BUILD_VERSION="0.11.2"
 VENDOR="UHU Linux Baráti Kör"
 PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
@@ -47,6 +47,7 @@ export UHUBUILD_VAR=/var/uhubuild
 export UHUBUILD_PATH=/usr/src/UHUBUILD
 	# Az UHUBUILD_PATH az a könyvtár, amelyben
 	# a fejlesztőkörnyezet megtalálható
+UHUBUILD_MISC_PATH="$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}
 
 if [ $# == 0 ]; then
 	redecho "*******************************************"
@@ -57,15 +58,14 @@ if [ $# == 0 ]; then
 	exit 1
 fi
 
-[ -d "$UHUBUILD_PATH" ] || {
-	# Nem létezik a Build környezet, létrehozzuk
-	mkdir -p "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/extrarelease/${UB_ARCH}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/failed/${UB_ARCH}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/compile/${UB_ARCH}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/snapshot/install/${UB_ARCH}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/logpack/${UB_ARCH}
-	mkdir -p "$UHUBUILD_PATH"/misc-${UHUBUILD_DISTR}/tmp/${UB_ARCH}
+# Nem létezik / hiányos a build környezet, létrehozzuk, ami hiányzik
+[ -d "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR} ] || mkdir -p "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}
+[ -d "$UHUBUILD_MISC_PATH"/extrarelease/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/extrarelease/${UB_ARCH}
+[ -d "$UHUBUILD_MISC_PATH"/failed/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/failed/${UB_ARCH}
+[ -d "$UHUBUILD_MISC_PATH"/snapshot/compile/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/snapshot/compile/${UB_ARCH}
+[ -d "$UHUBUILD_MISC_PATH"/snapshot/install/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/snapshot/install/${UB_ARCH}
+[ -d "$UHUBUILD_MISC_PATH"/logpack/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/logpack/${UB_ARCH}
+[ -d "$UHUBUILD_MISC_PATH"/tmp/${UB_ARCH ] || mkdir -p "$UHUBUILD_MISC_PATH"/tmp/${UB_ARCH}
 }
 
 for i in "$@"; do
