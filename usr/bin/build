@@ -32,7 +32,7 @@ case `basename $0` in
 	build-ubk1|build-UBK1)
 		export UHUBUILD_DISTR=UBK1;;
 	build-ubk2|build-UBK2)
-		export UHUBUILD_DISTR=UBK1;;
+		export UHUBUILD_DISTR=UBK2;;
 	build-dev)
 		export UHUBUILD_DISTR=dev;;
 esac
