@@ -66,7 +66,7 @@ fi
 [ -d "$UHUBUILD_MISC_PATH"/snapshot/install/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/snapshot/install/${UB_ARCH}
 [ -d "$UHUBUILD_MISC_PATH"/logpack/${UB_ARCH} ] || mkdir -p "$UHUBUILD_MISC_PATH"/logpack/${UB_ARCH}
 [ -d "$UHUBUILD_MISC_PATH"/tmp/${UB_ARCH ] || mkdir -p "$UHUBUILD_MISC_PATH"/tmp/${UB_ARCH}
-}
+
 
 for i in "$@"; do
 	case $1 in
