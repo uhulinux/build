@@ -388,7 +388,7 @@ echo
 
 	if [ "$UB_NEW_RELEASE" = "1" ]; then
 		newrel=$((rel+1))
-		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/${UB_ARCH}/"$i"/release
+		sed -i "s/$rel/$newrel/g" "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/"$i"/release
 		export UHUBUILD_EXTRARELEASE="1"
 	fi
 
