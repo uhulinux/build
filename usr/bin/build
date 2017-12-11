@@ -420,22 +420,24 @@ echo
 
 	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}/
 
-	rm -f Release.gpg
-
-	if [ "$UB_CONTENTS" = "1" ]; then
-		uhu-scanpkgs -c .
+	if [ -x /usr/bin/uhu-reposign ]; then
+		uhu-reposign "${UHUBUILD_DISTR}" "${UB_ARCH}" "$BUILD_GPGKEY"
 	else
-		uhu-scanpkgs .
+		rm -f Release.gpg
+		if [ "$UB_CONTENTS" = "1" ]; then
+			uhu-scanpkgs -c .
+		else
+			uhu-scanpkgs .
+		fi
+		apt-ftparchive release . \
+			-o APT::FTPArchive::Release::Origin="${VENDOR}" \
+			-o APT::FTPArchive::Release::Label="UHU Linux" \
+			-o APT::FTPArchive::Release::Version="${UHUBUILD_DISTR}" \
+			-o APT::FTPArchive::Release::Architectures="${UB_ARCH}" \
+			> ./Release  
+		gpg --default-key $BUILD_GPGKEY --armor --detach-sign --sign --output \
+			./Release.gpg ./Release
 	fi
-
-	apt-ftparchive release . \
-		-o APT::FTPArchive::Release::Origin="${VENDOR}" \
-		-o APT::FTPArchive::Release::Label="UHU Linux" \
-		-o APT::FTPArchive::Release::Version="${UHUBUILD_DISTR}" \
-		-o APT::FTPArchive::Release::Architectures="${UB_ARCH}" \
-		> ./Release  
-	gpg --default-key $BUILD_GPGKEY --armor --detach-sign --sign --output \
-		./Release.gpg ./Release
 
 	# Ezek után a /etc/apt/sources.list-1.2 állományba
 	# beírható pl. a következő sor:
