@@ -8,6 +8,6 @@
 deb file:/usr/src/UHUBUILD/packages-3/i386 ./
 
 # UBK
-deb ftp://ftp.ubk.hu/pkg/3/main ./
-# http://download.ubk.hu/pkg/3/main ./
+deb [arch=i386] ftp://ftp.ubk.hu/pkg/3/main/i386 ./
+# deb [arch=i386] http://download.ubk.hu/pkg/3/main/i386 ./
 

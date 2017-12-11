@@ -1,12 +1,3 @@
-_builddev()
-{
-        local cur foo
-        cur=${COMP_WORDS[COMP_CWORD]}
-        foo="$(/bin/ls /usr/src/UHUBUILD/UB-dev)"
-        COMPREPLY=($(compgen -W "$foo" -- "$cur"))
-}
-complete -F _builddev build-dev
-
 _build22()
 {
         local cur foo
@@ -33,3 +24,12 @@ _buildubk1()
         COMPREPLY=($(compgen -W "$foo" -- "$cur"))
 }
 complete -F _buildubk1 build-ubk1
+
+_buildubk2()
+{
+        local cur foo
+        cur=${COMP_WORDS[COMP_CWORD]}
+        foo="$(/bin/ls /usr/src/UHUBUILD/UB-UBK2)"
+        COMPREPLY=($(compgen -W "$foo" -- "$cur"))
+}
+complete -F _buildubk2 build-ubk2

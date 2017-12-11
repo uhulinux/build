@@ -18,9 +18,9 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.11.2"
+BUILD_VERSION="0.12.0"
 VENDOR="UHU Linux Baráti Kör"
-PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
+# PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
 case `basename $0` in
 	build)
@@ -33,8 +33,6 @@ case `basename $0` in
 		export UHUBUILD_DISTR=UBK1;;
 	build-ubk2|build-UBK2)
 		export UHUBUILD_DISTR=UBK2;;
-	build-dev)
-		export UHUBUILD_DISTR=dev;;
 esac
 
 [ "$UID" != 0 ] && {
@@ -424,11 +422,22 @@ echo
 
 	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}/
 
+	rm -f Release.gpg
+
 	if [ "$UB_CONTENTS" = "1" ]; then
 		uhu-scanpkgs -c .
 	else
 		uhu-scanpkgs .
 	fi
+
+	apt-ftparchive release . \
+		-o APT::FTPArchive::Release::Origin="UHU Linux Baráti Kör" \
+		-o APT::FTPArchive::Release::Label="UHU Linux" \
+		-o APT::FTPArchive::Release::Version="${UHUBUILD_DISTR}" \
+		-o APT::FTPArchive::Release::Architectures="${UB_ARCH}" \
+		> ./Release  
+	gpg --default-key $BUILD_GPGKEY --armor --detach-sign --sign --output \
+		./Release.gpg ./Release
 
 	# Ezek után a /etc/apt/sources.list-1.2 állományba
 	# beírható pl. a következő sor:
