@@ -18,7 +18,7 @@ scrollout
 # peritus <peritus@freemail.hu>
 # Páder Rezső <rezso@rezso.net>
 
-BUILD_VERSION="0.12.1"
+BUILD_VERSION="0.12.2"
 VENDOR="UHU Linux Baráti Kör"
 # PACKAGER=${PACKAGER:=UBK <ubk@ubk.hu>}
 
@@ -319,7 +319,25 @@ trap 'rm -rf $UHUBUILD_RESULTDIR' EXIT
 
 cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}
 
-uhu-scanpkgs .
+rm -f Packages{,.gz} Contents{,.gz} Release{,.gpg}
+
+if [ -x /usr/bin/uhu-reposign ]; then
+	uhu-reposign "${UHUBUILD_DISTR}" "${UB_ARCH}" "$BUILD_GPGKEY"
+else
+	if [ "$UB_CONTENTS" = "1" ]; then
+		uhu-scanpkgs -c .
+	else
+		uhu-scanpkgs .
+	fi
+	apt-ftparchive release . \
+		-o APT::FTPArchive::Release::Origin="${VENDOR}" \
+		-o APT::FTPArchive::Release::Label="UHU Linux" \
+		-o APT::FTPArchive::Release::Version="${UHUBUILD_DISTR}" \
+		-o APT::FTPArchive::Release::Architectures="${UB_ARCH}" \
+		> ./Release  
+	gpg --default-key $BUILD_GPGKEY --armor --detach-sign --sign --output \
+		./Release.gpg ./Release
+fi
 
 cd "$UHUBUILD_PATH"/UB-${UHUBUILD_DISTR}/
 uhubuild-check "$i" || exit 1
@@ -418,12 +436,13 @@ echo
 	# A Packages és Packages.gz fájlok létrehozása a lokálisan
 	# megtalálható új UHU csomagjaink alkalmazhatósága érdekében
 
-	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}/
+	cd "$UHUBUILD_PATH"/packages-${UHUBUILD_DISTR}/${UB_ARCH}
+
+	rm -f Packages{,.gz} Contents{,.gz} Release{,.gpg}
 
 	if [ -x /usr/bin/uhu-reposign ]; then
 		uhu-reposign "${UHUBUILD_DISTR}" "${UB_ARCH}" "$BUILD_GPGKEY"
 	else
-		rm -f Release.gpg
 		if [ "$UB_CONTENTS" = "1" ]; then
 			uhu-scanpkgs -c .
 		else
